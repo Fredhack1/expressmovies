@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="../public/style.css">
+    <title>Movies | Express Movies</title>
+</head>
+<body>
+    <div class="central">
+        <%- include('./partials/header') %>
+        
+        <h1><%= title %></h1>
+        <div class="french-movies">
+            <div>
+            <% for (movie of movies) { %>
+                <div><%= movie.title %> (<%= movie.year %>)</div>
+            <% } %>
+            </div>
+        </div>
+        <br>
+        <div>
+            <form action="/movies" method="post">
+                <label for="movieTitle">Titre du film</label><br>
+                <input type="text" name="movieTitle" id="movieTitle"><br><br>
+                <label for="movieYear">Année du film</label><br>
+                <input type="text" name="movieYear" id="movieYear"><br><br>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>        
+    </div>
+
+    <%- include('./partials/footer') %>
+
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('submit', addMovie);
+
+        function addMovie(event) {
+            event.preventDefault();
+
+           if (window.fetch) {
+            fetch('/movies', {
+                method: 'POST',
+                body: new FormData(form)
+            })
+            .then(checkStatus)
+            .catch((e) => {
+                console.error('Request failed', e);
+            })
+           } else {
+            // jQuery, XHR
+           } 
+        }
+
+        function checkStatus(response) {
+            if (response.status >= 200 && response.status < 300) {
+                let newMovieDiv = document.createElement('div');
+                const movieTitle = document.getElementById('movieTitle').value;
+                const movieYear = document.getElementById('movieYear').value;
+                newMovieDiv.innerHTML = `${movieTitle} (${movieYear})`;
+                // newMovieDiv.innerHTML = movieTitle + ' (' + movieYear + ')';
+                document.querySelector('.french-movies').appendChild(newMovieDiv);
+                form.reset();
+            }
+        }
+
+    </script>
+
+</body>
+</html>
